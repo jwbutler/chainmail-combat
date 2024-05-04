@@ -12,6 +12,8 @@ public final class MeleeController
     public record MeleeDamageResult(
         @NonNull List<Integer> attackerDiceRolled,
         @NonNull List<Integer> defenderDiceRolled,
+        int attackerKillThreshold,
+        int defenderKillThreshold,
         int attackerKills,
         int defenderKills
     )
@@ -25,18 +27,28 @@ public final class MeleeController
         List<Integer> attackerDiceRolled = rollDice(attackerDiceToRoll);
         int defenderDiceToRoll = _getNumDiceToRoll(defender, attacker);
         List<Integer> defenderDiceRolled = rollDice(defenderDiceToRoll);
-        int attackerKills = _countKills(attacker, defender, attackerDiceRolled);
-        int defenderKills = _countKills(defender, attacker, defenderDiceRolled);
-        return new MeleeDamageResult(attackerDiceRolled, defenderDiceRolled, attackerKills, defenderKills);
+        int attackerKillThreshold = _getKillThreshold(attacker, defender);
+        int defenderKillThreshold = _getKillThreshold(defender, attacker);
+        int attackerKills = _countKills(attackerDiceRolled, attackerKillThreshold, defender.count());
+        int defenderKills = _countKills(defenderDiceRolled, defenderKillThreshold, attacker.count());
+
+        return new MeleeDamageResult(
+            attackerDiceRolled,
+            defenderDiceRolled,
+            attackerKillThreshold,
+            defenderKillThreshold,
+            attackerKills,
+            defenderKills
+        );
     }
 
-    private static int _countKills(@NonNull Unit attacker, @NonNull Unit defender, @NonNull List<Integer> attackerDiceRolled)
+    private static int _countKills(@NonNull List<Integer> diceRolled, int killThreshold, int numEnemies)
     {
-        int kills = (int) attackerDiceRolled.stream()
+        int kills = (int) diceRolled.stream()
             .mapToInt(Integer::intValue)
-            .filter(value -> value >= _getMinRollToKill(attacker, defender))
+            .filter(value -> value >= killThreshold)
             .count();
-        return Math.min(kills, defender.count());
+        return Math.min(kills, numEnemies);
     }
 
     private static int _getNumDiceToRoll(@NonNull Unit attacker, @NonNull Unit defender)
@@ -90,7 +102,7 @@ public final class MeleeController
         return (int) Math.floor(factor * attacker.count());
     }
     
-    private static int _getMinRollToKill(@NonNull Unit attacker, @NonNull Unit defender)
+    private static int _getKillThreshold(@NonNull Unit attacker, @NonNull Unit defender)
     {
         return switch (attacker.type())
         {

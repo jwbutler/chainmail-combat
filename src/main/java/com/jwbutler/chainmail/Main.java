@@ -28,6 +28,8 @@ public final class Main
         PRINTER.println();
         var meleeController = new MeleeController();
         var result = meleeController.resolveMeleeDamage(attacker, defender);
+        PRINTER.printf("Attacker rolls %s dice (need >= %s to kill)%n", result.attackerDiceRolled().size(), result.attackerKillThreshold());
+        PRINTER.printf("Defender rolls %s dice (need >= %s to kill)%n", result.defenderDiceRolled().size(), result.defenderKillThreshold());
         PRINTER.println("Attacker dice rolled: " + result.attackerDiceRolled());
         PRINTER.println("Defender dice rolled: " + result.defenderDiceRolled());
         PRINTER.println("Attacker kills: " + result.attackerKills());
@@ -45,6 +47,7 @@ public final class Main
         PRINTER.println("Attacker score: " + postMeleeMoraleResult.attackerScore());
         PRINTER.println("Defender score: " + postMeleeMoraleResult.defenderScore());
         PRINTER.println("Outcome: " + postMeleeMoraleResult.outcome());
+        PRINTER.println("Die roll was: " + postMeleeMoraleResult.dieRoll());
     }
 
     @NonNull

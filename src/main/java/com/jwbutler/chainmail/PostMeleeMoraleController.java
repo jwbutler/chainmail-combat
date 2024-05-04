@@ -27,6 +27,7 @@ public final class PostMeleeMoraleController
     public record PostMeleeMoraleResult(
         int attackerScore,
         int defenderScore,
+        int dieRoll,
         @NonNull Outcome outcome
     )
     {
@@ -49,7 +50,8 @@ public final class PostMeleeMoraleController
         int attackerLosses = meleeResult.defenderKills();
         int defenderLosses = meleeResult.attackerKills();
         int lossesDifference = Math.abs(attackerLosses - defenderLosses);
-        int lossDifferenceTimesDiceRoll = lossesDifference * rollDie();
+        var dieRoll = rollDie();
+        int lossDifferenceTimesDiceRoll = lossesDifference * dieRoll;
         
         // 2. The side with the greater number of surviving troops which were involved in
         // the melee determines the positive difference between the number of his troops
@@ -150,7 +152,7 @@ public final class PostMeleeMoraleController
             }
         }
         
-        return new PostMeleeMoraleResult(attackerScore, defenderScore, outcome);
+        return new PostMeleeMoraleResult(attackerScore, defenderScore, dieRoll, outcome);
     }
     
     private static int _getMoraleRatingFactor(@NonNull UnitType unitType)
